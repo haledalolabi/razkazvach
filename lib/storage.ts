@@ -17,7 +17,7 @@ export const LocalStorage: StorageAdapter = {
     await fs.writeFile(p, data);
   },
   getUrl(key) {
-    return `${publicBase}/${encodeURIComponent(key)}`;
+    return `${publicBase}/${key.split("/").map(encodeURIComponent).join("/")}`;
   },
   async deleteObject(key) {
     const p = path.join(baseDir, key);
