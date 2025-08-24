@@ -1,0 +1,18 @@
+# dependencies
+node_modules
+
+# env
+.env*
+!.env.example
+
+# build
+.next
+out
+
+# misc
+coverage
+playwright-report
+test-results
+tsconfig.tsbuildinfo
+v8-compile-cache-*
+.DS_Store

@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rz-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: razkazvach
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  valkey:
+    image: valkey/valkey:7.2-alpine # drop-in redis alternative
+    container_name: rz-valkey
+    ports: ["6379:6379"]
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: rz-meili
+    environment:
+      MEILI_MASTER_KEY: masterKey
+    ports: ["7700:7700"]
+    volumes:
+      - meili:/meili_data
+
+volumes:
+  pgdata:
+  meili:
