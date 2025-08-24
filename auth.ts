@@ -8,13 +8,16 @@ import type { User } from "@prisma/client";
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
-  providers: [
-    EmailProvider({
-      server: process.env.EMAIL_SERVER!,
-      from: process.env.EMAIL_FROM!,
-      maxAge: 10 * 60,
-    }),
-  ],
+  providers:
+    process.env.EMAIL_SERVER && process.env.EMAIL_FROM
+      ? [
+          EmailProvider({
+            server: process.env.EMAIL_SERVER,
+            from: process.env.EMAIL_FROM,
+            maxAge: 10 * 60,
+          }),
+        ]
+      : [],
   callbacks: {
     async jwt({ token, user }) {
       if (user) (token as JWT).role = (user as User).role ?? "USER";

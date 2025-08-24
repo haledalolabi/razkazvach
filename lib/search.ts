@@ -1,13 +1,23 @@
 import { MeiliSearch } from "meilisearch";
 import type { Story } from "@prisma/client";
+import type { Index } from "meilisearch";
 
-const client = new MeiliSearch({
-  host: process.env.MEILI_HOST!,
-  apiKey: process.env.MEILI_API_KEY,
-});
+type SearchResult = Awaited<ReturnType<Index["search"]>>;
+
 const indexName = process.env.MEILI_INDEX_STORIES || "stories";
 
-export async function ensureStoryIndex() {
+function getClient() {
+  const host = process.env.MEILI_HOST;
+  if (!host) return null;
+  return new MeiliSearch({
+    host,
+    apiKey: process.env.MEILI_API_KEY,
+  });
+}
+
+export async function ensureStoryIndex(): Promise<Index | null> {
+  const client = getClient();
+  if (!client) return null;
   await client.createIndex(indexName, { primaryKey: "id" }).catch(() => {});
   const index = client.index(indexName);
   await index.updateSettings({
@@ -22,6 +32,7 @@ export async function upsertStoryIndex(
   s: Story & { body?: { html: string | null } | null },
 ) {
   const index = await ensureStoryIndex();
+  if (!index) return;
   await index.addDocuments([
     {
       id: s.id,
@@ -37,7 +48,8 @@ export async function upsertStoryIndex(
   ]);
 }
 
-export async function searchStories(q: string) {
+export async function searchStories(q: string): Promise<SearchResult> {
   const index = await ensureStoryIndex();
+  if (!index) return { hits: [] } as SearchResult;
   return index.search(q, { limit: 10 });
 }
