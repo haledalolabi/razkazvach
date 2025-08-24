@@ -39,6 +39,8 @@ async function main() {
       title: "Интерактивна Приказка (Демо)",
       description: "Една изборна история с 3 възела",
       tags: ["интерактивна", "демо"],
+      ageMin: 3,
+      ageMax: 8,
       isInteractive: true,
       status: "DRAFT",
     },
