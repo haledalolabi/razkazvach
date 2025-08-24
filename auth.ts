@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import EmailProvider from "next-auth/providers/email";
+import EmailProvider from "next-auth/providers/nodemailer";
 import type { NextAuthConfig } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
@@ -16,7 +16,10 @@ export const authConfig: NextAuthConfig = {
   session: { strategy: "database" },
   callbacks: {
     async session({ session, user }) {
-      if (session.user) (session.user as { role?: string }).role = user.role;
+      if (session.user)
+        (session.user as { role?: string }).role = (
+          user as { role?: string }
+        ).role;
       return session;
     },
   },

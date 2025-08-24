@@ -1,4 +1,4 @@
-import { MeiliSearch } from "meilisearch";
+import { MeiliSearch, type Index } from "meilisearch";
 import type { Story } from "@prisma/client";
 
 const client = new MeiliSearch({
@@ -7,10 +7,14 @@ const client = new MeiliSearch({
 });
 const indexName = process.env.MEILI_INDEX_STORIES || "stories";
 
-export async function ensureStoryIndex() {
-  const index = await client
-    .getIndex(indexName)
-    .catch(() => client.createIndex(indexName, { primaryKey: "id" }));
+export async function ensureStoryIndex(): Promise<Index> {
+  let index: Index;
+  try {
+    index = await client.getIndex(indexName);
+  } catch {
+    await client.createIndex(indexName, { primaryKey: "id" });
+    index = await client.getIndex(indexName);
+  }
   await index.updateSettings({
     searchableAttributes: ["title", "description", "tags"],
     filterableAttributes: ["ageMin", "ageMax", "status"],

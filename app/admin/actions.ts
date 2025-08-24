@@ -5,14 +5,14 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { upsertStoryIndex } from "@/lib/search";
 
-export async function upsertStory(formData: FormData) {
+export async function upsertStory(formData: FormData): Promise<void> {
   const parsed = StoryUpsertSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) throw new Error("Invalid story payload");
   const { id, bodyHtml, ...fields } = parsed.data as z.infer<
     typeof StoryUpsertSchema
   >;
 
-  const story = await prisma.story.upsert({
+  await prisma.story.upsert({
     where: { id: id ?? "" },
     update: {
       ...fields,
@@ -26,10 +26,9 @@ export async function upsertStory(formData: FormData) {
     },
   });
   revalidatePath("/admin");
-  return { id: story.id };
 }
 
-export async function publishStory(id: string) {
+export async function publishStory(id: string): Promise<void> {
   const s = await prisma.story.update({
     where: { id },
     data: { status: "PUBLISHED", publishedAt: new Date() },
@@ -37,5 +36,4 @@ export async function publishStory(id: string) {
   });
   await upsertStoryIndex(s);
   revalidatePath(`/prikazki/${s.slug}`);
-  return { ok: true };
 }
