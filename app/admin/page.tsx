@@ -2,9 +2,11 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function AdminPage() {
-  const stories = await prisma.story.findMany({
-    orderBy: { updatedAt: "desc" },
-  });
+  const stories = process.env.DATABASE_URL
+    ? await prisma.story.findMany({
+        orderBy: { updatedAt: "desc" },
+      })
+    : [];
   return (
     <main className="mx-auto max-w-4xl p-6">
       <div className="flex items-center justify-between">
