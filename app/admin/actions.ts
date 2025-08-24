@@ -21,13 +21,18 @@ export async function upsertStoryAction(formData: FormData): Promise<void> {
       ...rest,
       isInteractive,
       body: bodyHtml
-        ? { upsert: { create: { html: bodyHtml }, update: { html: bodyHtml } } }
+        ? {
+            upsert: {
+              create: { html: bodyHtml, lang: "bg" },
+              update: { html: bodyHtml },
+            },
+          }
         : undefined,
     },
     create: {
       ...rest,
       isInteractive,
-      body: bodyHtml ? { create: { html: bodyHtml } } : undefined,
+      body: bodyHtml ? { create: { html: bodyHtml, lang: "bg" } } : undefined,
     },
   });
 
