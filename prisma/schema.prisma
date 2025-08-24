@@ -7,9 +7,200 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Minimal model so prisma generate works cleanly
+// ---------------------- Auth.js (Prisma Adapter) ----------------------
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  image     String?
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+
+  sessions  Session[]
+  accounts  Account[]
+
+  // App relations
+  subscriptions   Subscription[]
+  readingProgress ReadingProgress[]
+  events          Event[]
+  experimentAssignments UserExperimentAssignment[]
 }
+
+enum Role {
+  ADMIN
+  EDITOR
+  USER
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --------------------------- Core domain ------------------------------
+model Subscription {
+  id               String   @id @default(cuid())
+  userId           String
+  provider         String   @default("stripe")
+  status           String   @default("inactive")
+  plan             String   @default("monthly") // monthly|semiannual|annual
+  currentPeriodEnd DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Story {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  title        String
+  description  String
+  ageMin       Int       @default(3)
+  ageMax       Int       @default(8)
+  tags         String[]  @default([])
+  coverUrl     String?
+  status       StoryStatus @default(DRAFT)
+  isInteractive Boolean   @default(false)
+  publishedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  body         StoryBody?
+  audio        AudioAsset?
+  nodes        InteractiveNode[]
+  readingProgress ReadingProgress[]
+  freeRotation  FreeRotation?
+}
+
+enum StoryStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+}
+
+model StoryBody {
+  storyId        String   @id
+  lang           String   @default("bg")
+  html           String
+  readingTimeSec Int      @default(0)
+  story          Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model AudioAsset {
+  id         String   @id @default(cuid())
+  storyId    String   @unique
+  voice      String
+  url        String
+  durationSec Int
+  quality     String   @default("std")
+  generatedAt DateTime @default(now())
+  story      Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model InteractiveNode {
+  id       String  @id @default(cuid())
+  storyId  String
+  bodyHtml String
+  story    Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  choices  InteractiveChoice[] @relation("FromNode")
+  incoming InteractiveChoice[] @relation("ToNode")
+
+  @@index([storyId])
+}
+
+model InteractiveChoice {
+  id         String @id @default(cuid())
+  fromNodeId String
+  label      String
+  toNodeId   String
+
+  fromNode InteractiveNode @relation("FromNode", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  toNode   InteractiveNode @relation("ToNode",   fields: [toNodeId],   references: [id], onDelete: Cascade)
+
+  @@index([fromNodeId])
+  @@index([toNodeId])
+}
+
+model ReadingProgress {
+  userId   String
+  storyId  String
+  lastPos  String   // e.g., caret offset or nodeId for interactive
+  updatedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, storyId])
+}
+
+model Event {
+  id     String   @id @default(cuid())
+  userId String?
+  name   String
+  props  Json
+  ts     DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([name, ts])
+}
+
+model ExperimentConfig {
+  key      String  @id
+  variants Json
+  updatedAt DateTime @updatedAt
+}
+
+model UserExperimentAssignment {
+  userId  String
+  key     String
+  variant String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, key])
+}
+
+model FreeRotation {
+  id       String  @id @default(cuid())
+  storyId  String  @unique
+  monthKey String  // e.g., 2025-08
+  priority Int     @default(0)
+  story    Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
