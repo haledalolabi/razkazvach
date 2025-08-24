@@ -11,3 +11,8 @@ test("health endpoint", async ({ request }) => {
   const json = await res.json();
   expect(json.ok).toBe(true);
 });
+
+test("search endpoint", async ({ request }) => {
+  const res = await request.get("/api/search?q=demo");
+  expect(res.status()).toBe(200);
+});

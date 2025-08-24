@@ -25,6 +25,13 @@ services:
     volumes:
       - meili:/meili_data
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: rz-mailpit
+    ports:
+      - "8025:8025"   # Web UI http://localhost:8025
+      - "1025:1025"   # SMTP server
+
 volumes:
   pgdata:
   meili:
