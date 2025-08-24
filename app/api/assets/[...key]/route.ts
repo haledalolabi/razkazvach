@@ -2,10 +2,11 @@ import fs from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 
-const uploadsRoot = process.env.ASSETS_DIR || "./uploads";
-const baseDir = path.isAbsolute(uploadsRoot)
-  ? uploadsRoot
-  : path.join(process.cwd(), uploadsRoot);
+// Resolve the directory that stores uploaded assets. This path can be
+// configured via the `ASSETS_DIR` environment variable. When not provided it
+// falls back to `<project root>/uploads`.
+const uploadsRoot = process.env.ASSETS_DIR ?? "uploads";
+const baseDir = path.resolve(process.cwd(), uploadsRoot);
 
 export async function GET(
   _req: Request,
@@ -16,6 +17,7 @@ export async function GET(
   console.log("asset request", {
     cwd: process.cwd(),
     uploadsRoot,
+    baseDir,
     filePath,
   });
 
