@@ -11,6 +11,8 @@ export default function NewStory() {
           placeholder="Title"
           className="w-full rounded border p-2"
           required
+          minLength={3}
+          maxLength={120}
         />
         <SlugInput />
         <textarea
@@ -18,6 +20,9 @@ export default function NewStory() {
           placeholder="Short description"
           className="w-full rounded border p-2"
           rows={3}
+          required
+          minLength={10}
+          maxLength={500}
         />
         <input
           name="tags"
@@ -32,6 +37,7 @@ export default function NewStory() {
             min={3}
             max={12}
             className="w-24 rounded border p-2"
+            required
           />
           <input
             name="ageMax"
@@ -40,6 +46,7 @@ export default function NewStory() {
             min={3}
             max={12}
             className="w-24 rounded border p-2"
+            required
           />
         </div>
         <label className="flex items-center gap-2">
