@@ -16,3 +16,4 @@ test-results
 tsconfig.tsbuildinfo
 v8-compile-cache-*
 .DS_Store
+uploads

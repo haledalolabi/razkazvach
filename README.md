@@ -1,4 +1,4 @@
-# Razkazvach — Foundation (Bite #1)
+# Razkazvach — Foundation (Bite #2)
 
 ## Prereqs
 
@@ -8,7 +8,9 @@
 
 1. `cp .env.example .env.local` and adjust as needed.
 2. Install deps: `pnpm install`.
-3. (Optional) Start dev services: `docker compose -f docker-compose.services.yml up -d`.
+3. Start dev services: `docker compose -f docker-compose.services.yml up -d` (brings up Postgres, Meili, Valkey, Mailpit).
+4. Run DB migrations: `pnpm dlx prisma migrate dev --name init_core`.
+5. Seed data: `pnpm db:seed`.
 
 ## Dev
 
@@ -17,6 +19,7 @@
 - `pnpm typecheck` — TS types.
 - `pnpm test` — unit tests.
 - `pnpm e2e` — end-to-end tests (builds and runs the app).
+- `pnpm db:seed` — seed database with demo stories and admin user.
 
 ## CI
 
@@ -25,3 +28,13 @@ GitHub Actions runs lint → typecheck → unit → build → e2e for pushes and
 ## Docker (production image)
 
 - `docker build -t razkazvach:latest .`
+
+## Auth & Admin
+
+- Visit `/auth/signin` and enter the seeded admin email (default `admin@example.com`).
+- Open Mailpit at [http://localhost:8025](http://localhost:8025) to access magic links.
+- `/admin` is protected by role (`ADMIN` or `EDITOR`).
+
+## Storage
+
+- Local uploads are stored under `./uploads` and served from `/api/assets/*`.
