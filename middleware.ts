@@ -1,12 +1,12 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   if (url.pathname.startsWith("/admin")) {
-    const session = await auth();
-    const role = session?.user.role;
+    const token = await getToken({ req });
+    const role = (token as { role?: string } | null)?.role;
     if (!role || (role !== "ADMIN" && role !== "EDITOR")) {
       const signInUrl = new URL("/auth/signin", url);
       return NextResponse.redirect(signInUrl);
