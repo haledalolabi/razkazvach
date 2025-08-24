@@ -23,17 +23,27 @@ export default async function EditStory({
           name="title"
           defaultValue={s.title}
           className="w-full rounded border p-2"
+          required
+          minLength={3}
+          maxLength={120}
         />
         <input
           name="slug"
           defaultValue={s.slug}
           className="w-full rounded border p-2"
+          required
+          minLength={3}
+          maxLength={140}
+          pattern="[a-z0-9-]+"
         />
         <textarea
           name="description"
           defaultValue={s.description}
           className="w-full rounded border p-2"
           rows={3}
+          required
+          minLength={10}
+          maxLength={500}
         />
         <input
           name="tags"
@@ -46,12 +56,18 @@ export default async function EditStory({
             type="number"
             defaultValue={s.ageMin}
             className="w-24 rounded border p-2"
+            min={3}
+            max={12}
+            required
           />
           <input
             name="ageMax"
             type="number"
             defaultValue={s.ageMax}
             className="w-24 rounded border p-2"
+            min={3}
+            max={12}
+            required
           />
         </div>
         <label className="flex items-center gap-2">
