@@ -1,5 +1,5 @@
 import { upsertStoryAction } from "@/app/admin/actions";
-import { toSlug } from "@/lib/slug";
+import SlugInput from "./SlugInput";
 
 export default function NewStory() {
   return (
@@ -12,14 +12,7 @@ export default function NewStory() {
           className="w-full rounded border p-2"
           required
         />
-        <input
-          name="slug"
-          placeholder="slug"
-          className="w-full rounded border p-2"
-          onChange={(e) =>
-            (e.currentTarget.value = toSlug(e.currentTarget.value))
-          }
-        />
+        <SlugInput />
         <textarea
           name="description"
           placeholder="Short description"
