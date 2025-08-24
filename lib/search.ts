@@ -38,6 +38,10 @@ export async function upsertStoryIndex(
 }
 
 export async function searchStories(q: string) {
-  const index = await ensureStoryIndex();
-  return index.search(q, { limit: 10 });
+  try {
+    const index = await ensureStoryIndex();
+    return await index.search(q, { limit: 10 });
+  } catch {
+    return { hits: [] };
+  }
 }
