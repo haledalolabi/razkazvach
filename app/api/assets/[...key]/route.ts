@@ -19,6 +19,11 @@ export async function GET(
     filePath,
   });
 
+  const relative = path.relative(baseDir, filePath);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
   try {
     const file = await fs.readFile(filePath);
     return new NextResponse(file);
