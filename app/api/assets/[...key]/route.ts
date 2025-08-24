@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 
@@ -10,8 +10,8 @@ export async function GET(
 ) {
   const filePath = path.join(baseDir, ...params.key);
   try {
-    const stream = fs.createReadStream(filePath);
-    return new NextResponse(stream as unknown as BodyInit);
+    const file = await fs.readFile(filePath);
+    return new NextResponse(file);
   } catch {
     return new NextResponse("Not found", { status: 404 });
   }
