@@ -14,7 +14,7 @@ export default function SignInPage() {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          await signIn("email", { email });
+          await signIn("nodemailer", { email });
         }}
         className="mt-4 space-y-3"
       >
