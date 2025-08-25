@@ -37,6 +37,7 @@
     "@commitlint/cli": "^19.4.0",
     "@commitlint/config-conventional": "^19.4.0",
     "@playwright/test": "^1.46.0",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^20.12.12",
     "@types/react": "^18.2.74",
     "@types/react-dom": "^18.2.24",
