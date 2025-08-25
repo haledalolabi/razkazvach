@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
+import { describe, expect, it, beforeAll, afterAll, vi } from "vitest";
 
 describe("LocalStorage and /api/assets", () => {
   const testUploads = "test-uploads";
@@ -31,5 +31,32 @@ describe("LocalStorage and /api/assets", () => {
     expect(body).toBe(data);
 
     await LocalStorage.deleteObject(key);
+  });
+
+  it("returns 404 when file is missing", async () => {
+    const { GET } = await import("../../app/api/assets/[...key]/route");
+
+    const res = await GET(new Request("http://example.com"), {
+      params: { key: ["missing.txt"] },
+    });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 500 for other fs errors", async () => {
+    const { GET } = await import("../../app/api/assets/[...key]/route");
+
+    const readFile = vi
+      .spyOn(fs, "readFile")
+      .mockRejectedValueOnce(
+        Object.assign(new Error("boom"), { code: "EACCES" }),
+      );
+
+    const res = await GET(new Request("http://example.com"), {
+      params: { key: ["boom.txt"] },
+    });
+
+    expect(res.status).toBe(500);
+    readFile.mockRestore();
   });
 });
