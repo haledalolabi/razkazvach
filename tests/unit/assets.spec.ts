@@ -33,6 +33,38 @@ describe("LocalStorage and /api/assets", () => {
     await LocalStorage.deleteObject(key);
   });
 
+  it("sets Content-Type for .txt files", async () => {
+    const { LocalStorage } = await import("../../lib/storage");
+    const { GET } = await import("../../app/api/assets/[...key]/route");
+
+    const key = "file.txt";
+    await LocalStorage.putObject(key, Buffer.from("data"));
+
+    const res = await GET(new Request("http://example.com"), {
+      params: { key: key.split("/") },
+    });
+
+    expect(res.headers.get("Content-Type")).toBe("text/plain");
+
+    await LocalStorage.deleteObject(key);
+  });
+
+  it("sets Content-Type for .png files", async () => {
+    const { LocalStorage } = await import("../../lib/storage");
+    const { GET } = await import("../../app/api/assets/[...key]/route");
+
+    const key = "image.png";
+    await LocalStorage.putObject(key, Buffer.from("png"));
+
+    const res = await GET(new Request("http://example.com"), {
+      params: { key: key.split("/") },
+    });
+
+    expect(res.headers.get("Content-Type")).toBe("image/png");
+
+    await LocalStorage.deleteObject(key);
+  });
+
   it("returns 404 when file is missing", async () => {
     const { GET } = await import("../../app/api/assets/[...key]/route");
 
