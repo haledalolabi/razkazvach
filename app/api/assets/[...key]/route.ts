@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
+import { lookup as getMimeType } from "mime-types";
 
 // Resolve the directory that stores uploaded assets. This path can be
 // configured via the `ASSETS_DIR` environment variable. When not provided it
@@ -28,7 +29,10 @@ export async function GET(
 
   try {
     const file = await fs.readFile(filePath);
-    return new NextResponse(file);
+    const mimeType = getMimeType(filePath) || "application/octet-stream";
+    return new NextResponse(file, {
+      headers: { "Content-Type": mimeType },
+    });
   } catch (err: unknown) {
     const error = err as NodeJS.ErrnoException;
     const code = error?.code;
