@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { Worker } from "bullmq";
 import { processTtsJob } from "@/lib/ttsWorker";
 import { registerTtsQueueEvents } from "@/lib/ttsQueue";

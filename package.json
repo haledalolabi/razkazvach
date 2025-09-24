@@ -17,15 +17,17 @@
     "test:watch": "vitest tests/unit",
     "e2e": "playwright test",
     "e2e:headed": "playwright test --headed",
+    "pree2e": "pnpm build",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
     "prepare": "husky install",
-    "worker:tts": "tsx worker/ttsWorker.ts"
+    "worker:tts": "tsx --env-file=.env.local worker/ttsWorker.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.1.0",
     "@prisma/client": "6.14.0",
     "bullmq": "^5.58.7",
+    "dotenv": "^17.2.2",
     "meilisearch": "^0.40.0",
     "mime-types": "^3.0.1",
     "next": "14.2.5",
@@ -62,5 +64,6 @@
     "tsx": "^4.7.1",
     "typescript": "5.5.4",
     "vitest": "^2.0.5"
-  }
+  },
+  "packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b"
 }
