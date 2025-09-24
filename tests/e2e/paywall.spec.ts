@@ -1,45 +1,23 @@
 import { test, expect } from "@playwright/test";
-import { prisma } from "@/lib/prisma";
 
 const slug = "paywall-e2e-story";
 
-test.beforeAll(async () => {
-  const story = await prisma.story.upsert({
-    where: { slug },
-    update: {
-      status: "PUBLISHED",
-      publishedAt: new Date(),
-      title: "Paywall Story",
-      description: "Story for paywall test",
-      ageMin: 4,
-      ageMax: 8,
-      tags: [],
-      body: {
-        upsert: {
-          update: { html: "<p>Hidden story</p>", lang: "bg" },
-          create: { html: "<p>Hidden story</p>", lang: "bg" },
-        },
-      },
-    },
-    create: {
+test.beforeAll(async ({ request }) => {
+  const response = await request.post("/api/test-utils/stories", {
+    data: {
       slug,
       title: "Paywall Story",
       description: "Story for paywall test",
       ageMin: 4,
       ageMax: 8,
       status: "PUBLISHED",
-      publishedAt: new Date(),
       tags: [],
-      body: { create: { html: "<p>Hidden story</p>", lang: "bg" } },
+      body: { html: "<p>Hidden story</p>", lang: "bg" },
+      clearFreeRotation: true,
     },
-    include: { body: true },
   });
 
-  await prisma.freeRotation.deleteMany({ where: { storyId: story.id } });
-});
-
-test.afterAll(async () => {
-  await prisma.$disconnect();
+  expect(response.status()).toBe(200);
 });
 
 test("non-premium users are redirected to paywall", async ({ page }) => {
