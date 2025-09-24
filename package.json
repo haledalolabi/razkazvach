@@ -19,11 +19,13 @@
     "e2e:headed": "playwright test --headed",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "worker:tts": "tsx worker/ttsWorker.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.1.0",
     "@prisma/client": "6.14.0",
+    "bullmq": "^5.58.7",
     "meilisearch": "^0.40.0",
     "mime-types": "^3.0.1",
     "next": "14.2.5",
@@ -31,6 +33,8 @@
     "nodemailer": "^6.9.11",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "stripe": "^18.5.0",
+    "undici": "^7.16.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

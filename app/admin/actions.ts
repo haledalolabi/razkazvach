@@ -5,6 +5,7 @@ import { StoryUpsertSchema } from "@/lib/validators";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { upsertStoryIndex } from "@/lib/search";
+import { enqueueTtsJob } from "@/lib/ttsQueue";
 
 export async function upsertStoryAction(formData: FormData): Promise<void> {
   const parsed = StoryUpsertSchema.safeParse(Object.fromEntries(formData));
@@ -43,8 +44,11 @@ export async function publishStoryAction(id: string): Promise<void> {
   const s = await prisma.story.update({
     where: { id },
     data: { status: "PUBLISHED", publishedAt: new Date() },
-    include: { body: true },
+    include: { body: true, audio: true },
   });
+  if (!s.audio?.url && s.body?.html) {
+    await enqueueTtsJob(s.id);
+  }
   await upsertStoryIndex(s);
   revalidatePath(`/prikazki/${s.slug}`);
 }
