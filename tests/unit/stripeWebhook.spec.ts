@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, type Mock } from "vitest";
 import {
   handleStripeEvent,
   priceToPlan,
@@ -48,7 +48,7 @@ describe("priceToPlan", () => {
 describe("handleStripeEvent", () => {
   it("skips duplicate events", async () => {
     const deps = baseDeps();
-    deps.prisma.webhookReceipt.findUnique.mockResolvedValue({
+    (deps.prisma.webhookReceipt.findUnique as Mock).mockResolvedValue({
       id: "w1",
     } as unknown);
     const event = {
