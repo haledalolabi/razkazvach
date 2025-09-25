@@ -1,28 +1,21 @@
-import { prisma } from "@/lib/prisma";
+import {
+  currentMonthKey,
+  getFreeRotationForMonth,
+  hasActiveSubscription,
+  resolveCurrentUserId,
+  subscriptionGrantsPremium,
+} from "@/lib/entitlements";
 
-const PREMIUM_STATUSES = new Set(["active", "trialing", "past_due"]);
-
-export function subscriptionGrantsPremium(status?: string | null): boolean {
-  if (!status) return false;
-  return PREMIUM_STATUSES.has(status);
-}
+export { subscriptionGrantsPremium };
 
 export async function hasPremium(): Promise<boolean> {
-  const { auth } = await import("@/auth");
-  const session = await auth();
-  const email = session?.user?.email;
-  if (!email) return false;
-
-  const user = await prisma.user.findUnique({
-    where: { email },
-    include: { subscriptions: true },
-  });
-  const subscription = user?.subscriptions?.[0];
-  return subscriptionGrantsPremium(subscription?.status ?? null);
+  const { id } = await resolveCurrentUserId();
+  return hasActiveSubscription(id);
 }
 
 export async function isFreeStory(storyId: string): Promise<boolean> {
-  const rotation = await prisma.freeRotation.findUnique({ where: { storyId } });
+  const monthKey = currentMonthKey();
+  const rotation = await getFreeRotationForMonth(storyId, monthKey);
   return !!rotation;
 }
 

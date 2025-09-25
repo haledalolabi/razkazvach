@@ -2,7 +2,15 @@ import { test, expect } from "@playwright/test";
 
 test("home renders", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Razkazvach" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: /Уютни български истории/i,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Разгледай каталога" }),
+  ).toBeVisible();
 });
 
 test("health endpoint", async ({ request }) => {
