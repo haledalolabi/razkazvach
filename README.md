@@ -32,7 +32,7 @@ Mailpit captures magic link emails at [http://localhost:8025](http://localhost:8
 
 ## Paywall & Premium access
 
-- Story APIs and the SSR reader (`/prikazki/[slug]`) call `canAccessStory` to enforce free-rotation or premium access.
+- Story APIs and the SSR reader (`/prikazki/[slug]`) rely on helpers in `lib/entitlements.ts` to enforce free-rotation or premium access.
 - Non-premium users hitting a non-free story are redirected to `/paywall`, which offers upgrade plans and posts to `/api/pay/checkout`.
 - After payment, Stripe redirects to `/pay/success`; cancelations go to `/pay/cancel`.
 
